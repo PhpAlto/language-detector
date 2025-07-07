@@ -110,14 +110,15 @@ class LanguageDetector
      */
     private function includeProfileFile(string $filePath): mixed
     {
-        set_error_handler(function (int $errno, string $errstr, string $errfile, int $errline): bool { return true; });
-        try {
-            return include $filePath;
-        } catch (\Throwable $e) {
-            throw new RuntimeException("Failed to include profile file '{$filePath}': " . $e->getMessage(), 0, $e);
-        } finally {
-            restore_error_handler();
+        // Suppress warnings, but not fatal errors
+        $result = @include $filePath;
+        if ($result === false) {
+            throw new InvalidArgumentException("Failed to include profile file '{$filePath}' (file not found or not readable).");
         }
+        if (!is_array($result)) {
+            throw new InvalidArgumentException("Language profiles file did not return an array.");
+        }
+        return $result;
     }
 
     /**
@@ -216,7 +217,7 @@ class LanguageDetector
             restore_error_handler();
         }
 
-        if (!is_array($tokens) || count($tokens) <= 1) {
+        if (!$tokens || count($tokens) <= 1) {
             return false;
         }
 
@@ -245,7 +246,7 @@ class LanguageDetector
                 } elseif ($tokenId === T_STRING && in_array(strtolower($token[1]), ['__construct', '__destruct', '__call', '__get', '__set'], true)) {
                     $hasPhpSpecificTokens = true;
                 }
-            } elseif (is_string($token) && trim($token) !== '') {
+            } elseif (trim($token) !== '') {
                 $nonWhitespaceTokens++;
             }
         }
@@ -265,22 +266,20 @@ class LanguageDetector
 
         // Loop through the loaded profiles
         foreach ($this->profiles as $lang => $profile) {
-            if (!is_array($profile)) {
-                continue;
-            }
-            // Ensure profile has expected keys before accessing to avoid errors
-            // Add default empty arrays if keys are missing
-            $profile['markers'] = isset($profile['markers']) ? $profile['markers'] : [];
-            $profile['keywords'] = isset($profile['keywords']) ? $profile['keywords'] : [];
-            $profile['patterns'] = isset($profile['patterns']) ? $profile['patterns'] : [];
-            $profile['negative_keywords'] = isset($profile['negative_keywords']) ? $profile['negative_keywords'] : [];
+            // Defensive: ensure all profile keys are arrays (for PHPStan level 9)
+            $profile['markers'] = isset($profile['markers']) && is_array($profile['markers']) ? $profile['markers'] : [];
+            $profile['keywords'] = isset($profile['keywords']) && is_array($profile['keywords']) ? $profile['keywords'] : [];
+            $profile['patterns'] = isset($profile['patterns']) && is_array($profile['patterns']) ? $profile['patterns'] : [];
+            $profile['negative_keywords'] = isset($profile['negative_keywords']) && is_array($profile['negative_keywords']) ? $profile['negative_keywords'] : [];
 
             $currentScore = 0.0;
 
             // 1. Check for definitive start markers
             foreach ($profile['markers'] as $marker => $weight) {
-                $markerText = is_int($marker) && is_string($weight) ? $weight : (is_string($marker) ? $marker : '');
-                $markerWeight = is_int($marker) ? 10 : (is_numeric($weight) ? (float)$weight : 0.0);
+                $markerText = is_int($marker)
+                    ? (is_string($weight) ? $weight : '')
+                    : $marker;
+                $markerWeight = is_int($marker) ? 10 : (is_numeric($weight) ? (float) $weight : 0.0);
                 if ($markerText !== '' && str_starts_with($code, $markerText)) {
                     $currentScore += $markerWeight;
                     break;
@@ -289,8 +288,8 @@ class LanguageDetector
 
             // 2. Check keywords (case-insensitive)
             foreach ($profile['keywords'] as $keyword => $weight) {
-                $keywordStr = $keyword;
-                $weightVal = is_numeric($weight) ? (float)$weight : 0.0;
+                $keywordStr = is_string($keyword) ? $keyword : '';
+                $weightVal = is_numeric($weight) ? (float) $weight : 0.0;
                 if ($keywordStr !== '' && str_contains($codeLower, strtolower($keywordStr))) {
                     $currentScore += $weightVal;
                 }
@@ -298,8 +297,8 @@ class LanguageDetector
 
             // 3. Check regex patterns
             foreach ($profile['patterns'] as $pattern => $weight) {
-                $patternStr = $pattern;
-                $weightVal = is_numeric($weight) ? (float)$weight : 0.0;
+                $patternStr = is_string($pattern) ? $pattern : '';
+                $weightVal = is_numeric($weight) ? (float) $weight : 0.0;
                 if ($patternStr !== '' && @preg_match($patternStr, $code)) {
                     $currentScore += $weightVal;
                 }
@@ -307,8 +306,8 @@ class LanguageDetector
 
             // 4. Apply negative keywords (penalties)
             foreach ($profile['negative_keywords'] as $marker => $penalty) {
-                $markerStr = $marker;
-                $penaltyVal = is_numeric($penalty) ? (float)$penalty : 0.0;
+                $markerStr = is_string($marker) ? $marker : '';
+                $penaltyVal = is_numeric($penalty) ? (float) $penalty : 0.0;
                 if ($markerStr !== '' && stripos($code, $markerStr) !== false) {
                     $currentScore += $penaltyVal;
                 }
