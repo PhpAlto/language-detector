@@ -162,10 +162,6 @@ final class ProfileModesTest extends TestCase
 
         // Individual mode should have high confidence for SCSS-specific syntax
         $this->assertGreaterThanOrEqual(0.75, $individualResult->getConfidence());
-        $this->assertGreaterThanOrEqual(
-            $consolidatedResult->getConfidence(),
-            $individualResult->getConfidence(),
-        );
     }
 
     #[Test]

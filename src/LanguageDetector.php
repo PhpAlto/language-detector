@@ -15,8 +15,11 @@ namespace Alto\LanguageDetector;
 
 /**
  * Detects the programming language of a code snippet using heuristics.
+ *
  * Aims to be a lightweight, dependency-free component.
  * Loads language profiles from an external PHP file.
+ *
+ * @author Simon André <smn.andre@gmail.com>
  */
 class LanguageDetector
 {

@@ -11,12 +11,12 @@ declare(strict_types=1);
  * the LICENSE file distributed with this source code.
  */
 
-namespace Alto\LanguageDetector; // Your chosen namespace
+namespace Alto\LanguageDetector;
 
 /**
  * Represents the result of a language detection attempt.
  *
- * This is an immutable value object.
+ * @author Simon André <smn.andre@gmail.com>
  */
 final readonly class DetectionResult
 {
@@ -60,10 +60,6 @@ final readonly class DetectionResult
      */
     public function getLanguage(): ?string
     {
-        // You might tie this to a confidence threshold, e.g.:
-        // if ($this->confidence < LanguageDetector::CONFIDENCE_THRESHOLD) {
-        //     return null;
-        // }
         return $this->language;
     }
 

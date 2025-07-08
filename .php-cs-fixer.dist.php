@@ -19,6 +19,7 @@ $finder = (new PhpCsFixer\Finder())
 return (new PhpCsFixer\Config())
     ->setParallelConfig(PhpCsFixer\Runner\Parallel\ParallelConfigFactory::detect())
     ->setFinder($finder)
+    ->setRiskyAllowed(true)
     ->setRules([
         '@PER-CS' => true,
         '@Symfony' => true,
