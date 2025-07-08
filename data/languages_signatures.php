@@ -1,5 +1,16 @@
 <?php
 
+declare(strict_types=1);
+
+/*
+ * This file is part of the ALTO library.
+ *
+ * © 2025–present Simon André
+ *
+ * For full copyright and license information, please see
+ * the LICENSE file distributed with this source code.
+ */
+
 return [
     'javascript' => [
         'patterns' => [
@@ -89,21 +100,28 @@ return [
     ],
     'typescript' => [
         'patterns' => [
-            '/interface\s+[A-Za-z_][$\w]*\s*{/' => 4,
-            '/type\s+[A-Za-z_][$\w]*\s*=/' => 3,
-            '/:\s*[A-Za-z_][$\w]*(\[\])?(\s*\||\s*&)?/' => 2,
-            '/\<[A-Za-z_][$\w]*\>/' => 2,
-            '/class\s+[A-Za-z_][$\w]*\s*(\<.*\>)?\s*{/' => 2,
+            '/interface\s+[A-Za-z_][$\w]*\s*{/' => 6, // stronger weight for interface
+            '/type\s+[A-Za-z_][$\w]*\s*=/' => 5,
+            '/:\s*[A-Za-z_][$\w]*(\[\])?(\s*\||\s*&)?/' => 3,
+            '/<[A-Za-z_][$\w]*>/' => 2,
+            '/class\s+[A-Za-z_][$\w]*\s*(<.*>)?\s*{/' => 2,
+            '/enum\s+[A-Za-z_][$\w]*\s*{/' => 4,
+            '/implements\s+[A-Za-z_][$\w]*/' => 3,
+            '/readonly\s+[A-Za-z_][$\w]*/' => 2,
+            '/public\s+[A-Za-z_][$\w]*/' => 2,
+            '/private\s+[A-Za-z_][$\w]*/' => 2,
+            '/protected\s+[A-Za-z_][$\w]*/' => 2,
         ],
         'keywords' => [
-            'interface' => 3,
-            'type' => 3,
-            'namespace' => 2,
-            'extends' => 1,
-            'implements' => 1,
+            'interface' => 5,
+            'type' => 4,
+            'enum' => 3,
+            'implements' => 2,
             'readonly' => 2,
-            'private' => 1,
             'public' => 1,
+            'private' => 1,
+            'protected' => 1,
+            'namespace' => 2,
         ],
     ],
 
@@ -369,6 +387,30 @@ return [
             'CREATE' => 2,
             'TABLE' => 2,
             'JOIN' => 2,
+        ],
+    ],
+
+    'scss' => [
+        'patterns' => [
+            '/\$[a-zA-Z_][\w-]*\s*:\s*[^;]+;/' => 8, // higher weight for variables
+            '/@mixin\s+[a-zA-Z_][\w-]*\s*(\([^)]*\))?\s*{/' => 6,
+            '/@include\s+[a-zA-Z_][\w-]*\s*(\([^)]*\))?;/' => 6,
+            '/@extend\s+[.#%]?[a-zA-Z_][\w-]*;/' => 5,
+            '/@import\s+[\'"][^\'\"]+[\'"];/' => 4,
+            '/&(:?[\w-]+|\s*{)/' => 3,
+            '/#{[^}]+}/' => 3,
+            '/@(if|else|for|while|each)\s+/' => 4,
+            '/@function\s+[a-zA-Z_][\w-]*\s*\(/' => 5,
+        ],
+        'keywords' => [
+            'mixin' => 4,
+            'include' => 4,
+            'extend' => 4,
+            'import' => 3,
+            'function' => 4,
+            'return' => 2,
+            'if' => 2,
+            'else' => 2,
         ],
     ],
 ];

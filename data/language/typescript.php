@@ -2,14 +2,13 @@
 
 declare(strict_types=1);
 
-/**
- * Language Profile for TypeScript detection.
- * For use with Alto\LanguageDetector
+/*
+ * This file is part of the ALTO library.
  *
- * This file returns an array containing the heuristic definition for TypeScript.
- * TypeScript extends JavaScript with static typing.
+ * © 2025–present Simon André
  *
- * @return array The language profiles array containing 'typescript'.
+ * For full copyright and license information, please see
+ * the LICENSE file distributed with this source code.
  */
 
 return [

@@ -1,16 +1,41 @@
 {
     "name": "alto/language-detector",
+    "description": "Detect programming languages from code snippets with high accuracy",
+    "license": "MIT",
     "type": "library",
-    "description": "A simple language detector for PHP.",
     "keywords": [
         "language",
         "detector",
-        "language-detector"
+        "language-detector",
+        "php",
+        "programming-language",
+        "code-detection",
+        "syntax-detection",
+        "javascript",
+        "typescript",
+        "python",
+        "java",
+        "html",
+        "css",
+        "developer-tools",
+        "auto-detect"
     ],
     "authors": [
         {
             "name": "Simon André",
-            "email": "smn.andre@gmail.com"
+            "email": "smn.andre@gmail.com",
+            "role": "Author"
+        }
+    ],
+    "homepage": "https://github.com/phpalto/language-detector",
+    "support": {
+        "issues": "https://github.com/phpalto/language-detector/issues",
+        "docs": "https://github.com/phpalto/language-detector#readme"
+    },
+    "funding": [
+        {
+            "type": "github",
+            "url": "https://github.com/sponsors/smnandre"
         }
     ],
     "require": {
@@ -18,8 +43,11 @@
     },
     "require-dev": {
         "friendsofphp/php-cs-fixer": "^3.75",
+        "phpstan/phpstan": "^2.0",
         "phpunit/phpunit": "^12.1"
     },
+    "minimum-stability": "stable",
+    "prefer-stable": true,
     "autoload": {
         "psr-4": {
             "Alto\\LanguageDetector\\": "src/"
@@ -29,5 +57,28 @@
         "psr-4": {
             "Alto\\LanguageDetector\\Tests\\": "tests/"
         }
+    },
+    "config": {
+        "allow-plugins": {
+            "php-http/discovery": true
+        },
+        "sort-packages": true
+    },
+    "extra": {
+        "branch-alias": {
+            "dev-main": "1.x-dev"
+        }
+    },
+    "scripts": {
+        "analyse": "phpstan analyse",
+        "cs-check": "php-cs-fixer fix --dry-run --diff",
+        "cs-fix": "php-cs-fixer fix",
+        "quality": [
+            "@cs-check",
+            "@analyse",
+            "@test"
+        ],
+        "test": "phpunit",
+        "test-coverage": "phpunit --coverage-html coverage"
     }
 }

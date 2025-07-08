@@ -2,18 +2,24 @@
 
 declare(strict_types=1);
 
+/*
+ * This file is part of the ALTO library.
+ *
+ * © 2025–present Simon André
+ *
+ * For full copyright and license information, please see
+ * the LICENSE file distributed with this source code.
+ */
+
 namespace Alto\LanguageDetector\Tests;
 
-use Alto\LanguageDetector\LanguageDetector;
 use Alto\LanguageDetector\DetectionResult;
-use PHPUnit\Framework\TestCase;
+use Alto\LanguageDetector\LanguageDetector;
 use PHPUnit\Framework\Attributes\CoversClass;
-use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Test;
+use PHPUnit\Framework\TestCase;
 
-/**
- * Unit tests for the LanguageDetector class.
- */
 #[CoversClass(LanguageDetector::class)]
 #[CoversClass(DetectionResult::class)]
 final class LanguageDetectorTest extends TestCase
@@ -23,20 +29,20 @@ final class LanguageDetectorTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
-        $this->detector = new LanguageDetector(__DIR__ . '/../data/language');
+        $this->detector = new LanguageDetector(__DIR__.'/../data/language');
     }
 
     #[Test]
     public function testConstructorWithDirectory(): void
     {
-        $detector = new LanguageDetector(__DIR__ . '/../data/language');
+        $detector = new LanguageDetector(__DIR__.'/../data/language');
         $this->assertInstanceOf(LanguageDetector::class, $detector);
     }
 
     #[Test]
     public function testConstructorWithFile(): void
     {
-        $detector = new LanguageDetector(__DIR__ . '/../data/languages_signatures.php');
+        $detector = new LanguageDetector(__DIR__.'/../data/languages_signatures.php');
         $this->assertInstanceOf(LanguageDetector::class, $detector);
     }
 
@@ -74,7 +80,7 @@ final class LanguageDetectorTest extends TestCase
         $result = $this->detector->detect('function test() {}');
 
         // Should either return null or a language with confidence >= threshold
-        if ($result->getLanguage() !== null) {
+        if (null !== $result->getLanguage()) {
             $this->assertGreaterThanOrEqual(0.25, $result->getConfidence());
         } else {
             // If no language detected, confidence should be low
@@ -92,9 +98,6 @@ final class LanguageDetectorTest extends TestCase
         $this->assertGreaterThan(0.25, $result->getConfidence());
     }
 
-    /**
-     * Provides test cases for basic language detection.
-     */
     public static function languageDetectionProvider(): array
     {
         return [
@@ -134,7 +137,7 @@ final class LanguageDetectorTest extends TestCase
         $result = $this->detector->detect('$variable = "test"; $object->method(); Class::staticCall();');
 
         // This might be detected as PHP or might return null depending on confidence
-        if ($result->getLanguage() === 'php') {
+        if ('php' === $result->getLanguage()) {
             $this->assertGreaterThan(0.25, $result->getConfidence());
         }
     }
@@ -162,8 +165,7 @@ final class LanguageDetectorTest extends TestCase
     #[Test]
     public function testConstructorWithEmptyDirectory(): void
     {
-        // Create a temporary empty directory
-        $tempDir = sys_get_temp_dir() . '/empty_profiles_' . uniqid();
+        $tempDir = sys_get_temp_dir().'/empty_profiles_'.uniqid();
         mkdir($tempDir);
 
         try {
@@ -179,7 +181,6 @@ final class LanguageDetectorTest extends TestCase
     #[Test]
     public function testConstructorWithInvalidProfileFile(): void
     {
-        // Create a temporary file that doesn't return an array
         $tempFile = tempnam(sys_get_temp_dir(), 'invalid_profile');
         file_put_contents($tempFile, '<?php return "not an array";');
 
@@ -227,7 +228,7 @@ final class LanguageDetectorTest extends TestCase
         $result = $this->detector->detect($phpLikeCode);
 
         // This should either detect as PHP or return null based on confidence
-        if ($result->getLanguage() === 'php') {
+        if ('php' === $result->getLanguage()) {
             $this->assertGreaterThanOrEqual(0.25, $result->getConfidence());
         } else {
             // If not detected as PHP, that's also valid due to lack of <?php tag
@@ -244,7 +245,7 @@ final class LanguageDetectorTest extends TestCase
         $result = $this->detector->detect($ambiguousCode);
 
         // Should either detect as javascript or return null
-        if ($result->getLanguage() !== null) {
+        if (null !== $result->getLanguage()) {
             $this->assertContains($result->getLanguage(), ['javascript', 'typescript']);
             $this->assertGreaterThanOrEqual(0.25, $result->getConfidence());
         } else {

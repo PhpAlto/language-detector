@@ -2,13 +2,13 @@
 
 /**
  * Language Profile for PHP detection (Heuristic Only).
- * For use with Alto\LanguageDetector
+ * For use with Alto\LanguageDetector.
  *
  * This file returns an array containing the heuristic definition for PHP.
  * It assumes detection relies solely on markers, keywords, patterns etc.
  * defined here, without a special tokenizer pre-check.
  *
- * @return array The language profiles array containing only 'php'.
+ * @return array the language profiles array containing only 'php'
  */
 
 return [

@@ -2,26 +2,28 @@
 
 declare(strict_types=1);
 
+/*
+ * This file is part of the ALTO library.
+ *
+ * © 2025–present Simon André
+ *
+ * For full copyright and license information, please see
+ * the LICENSE file distributed with this source code.
+ */
+
 namespace Alto\LanguageDetector\Tests\Language;
 
-use Alto\LanguageDetector\Tests\BaseDetectionCase;
-use Alto\LanguageDetector\LanguageDetector;
 use Alto\LanguageDetector\DetectionResult;
-use PHPUnit\Framework\Attributes\DataProvider;
+use Alto\LanguageDetector\LanguageDetector;
+use Alto\LanguageDetector\Tests\BaseDetectionCase;
 use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Test;
 
-/**
- * Integration tests for the enhanced language detector.
- * Tests realistic code samples with appropriate confidence expectations.
- */
 #[CoversClass(LanguageDetector::class)]
 #[CoversClass(DetectionResult::class)]
 final class IntegrationTest extends BaseDetectionCase
 {
-    /**
-     * Tests that realistic code snippets are correctly identified.
-     */
     #[Test]
     #[DataProvider('languageSnippetsProvider')]
     public function testDetectsLanguagesCorrectly(string $snippet, string $expectedLanguage): void
@@ -35,17 +37,13 @@ final class IntegrationTest extends BaseDetectionCase
         $this->assertGreaterThan(
             0.25,
             $result->getConfidence(),
-            "Confidence too low for {$expectedLanguage}: " . $result->getConfidence(),
+            "Confidence too low for {$expectedLanguage}: ".$result->getConfidence(),
         );
     }
 
-    /**
-     * Provides realistic code snippets for each supported language.
-     */
     public static function languageSnippetsProvider(): array
     {
         return [
-            // PHP (with tokenizer support)
             ['<?php echo "Hello World"; $name = "test"; $obj->method();', 'php'],
             ['<?php class MyClass { public function test() { return true; } }', 'php'],
 
@@ -77,16 +75,12 @@ final class IntegrationTest extends BaseDetectionCase
         ];
     }
 
-    /**
-     * Tests language disambiguation - ensures languages are not confused with similar ones.
-     */
     #[Test]
     #[DataProvider('disambiguationProvider')]
     public function testLanguageDisambiguation(string $snippet, string $correctLanguage, string $incorrectLanguage): void
     {
         $result = $this->detector->detect($snippet);
 
-        // Should detect the correct language
         $this->assertSame(
             $correctLanguage,
             $result->getLanguage(),
@@ -94,9 +88,6 @@ final class IntegrationTest extends BaseDetectionCase
         );
     }
 
-    /**
-     * Provides test cases for language disambiguation.
-     */
     public static function disambiguationProvider(): array
     {
         return [

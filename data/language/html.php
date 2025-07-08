@@ -2,14 +2,13 @@
 
 declare(strict_types=1);
 
-/**
- * Language Profile for HTML detection.
- * For use with Alto\LanguageDetector
+/*
+ * This file is part of the ALTO library.
  *
- * This file returns an array containing the heuristic definition for HTML.
- * Focuses on tag structures, DOCTYPE, comments, and entities.
+ * © 2025–present Simon André
  *
- * @return array The language profiles array containing only 'html'.
+ * For full copyright and license information, please see
+ * the LICENSE file distributed with this source code.
  */
 
 return [
@@ -47,6 +46,5 @@ return [
             'SELECT ' => -7,                // SQL
             'def ' => -7, 'import ' => -3,     // Python/JS
         ],
-
     ],
 ];

@@ -2,13 +2,13 @@
 
 declare(strict_types=1);
 
-/**
- * Language Profile for Twig template language detection.
- * For use with Alto\LanguageDetector
+/*
+ * This file is part of the ALTO library.
  *
- * This file returns an array containing the heuristic definition for Twig.
+ * © 2025–present Simon André
  *
- * @return array The language profiles array containing only 'twig'.
+ * For full copyright and license information, please see
+ * the LICENSE file distributed with this source code.
  */
 
 return [

@@ -2,10 +2,16 @@
 
 declare(strict_types=1);
 
-namespace Alto\LanguageDetector;
+/*
+ * This file is part of the ALTO library.
+ *
+ * © 2025–present Simon André
+ *
+ * For full copyright and license information, please see
+ * the LICENSE file distributed with this source code.
+ */
 
-use InvalidArgumentException;
-use RuntimeException;
+namespace Alto\LanguageDetector;
 
 /**
  * Detects the programming language of a code snippet using heuristics.
@@ -17,12 +23,13 @@ class LanguageDetector
     // Minimum length for a snippet to be considered analyzable
     private const MIN_LENGTH = 10;
     // Minimum confidence score required to return a language name (vs null)
-    public const CONFIDENCE_THRESHOLD = 0.25;
+    public const CONFIDENCE_THRESHOLD = 0.20;
 
     /**
      * Holds the language profiles loaded from the external file.
-     * Expected structure: ['lang_code' => ['markers'=>[], 'keywords'=>[], ...], ...]
-     * @var array<string, array<string, mixed>>
+     * Expected structure: ['lang_code' => array<mixed>, ...].
+     *
+     * @var array<string, array<mixed>>
      */
     private array $profiles;
 
@@ -30,10 +37,11 @@ class LanguageDetector
      * Constructor - Loads language profiles from individual files or fallback file.
      *
      * @param string $profilesPath Can be either:
-     *   - Path to a directory containing individual language profile files (*.php)
-     *   - Path to a single PHP file containing consolidated language profiles array
-     * @throws InvalidArgumentException If the path is invalid or files don't return proper arrays.
-     * @throws RuntimeException If files cannot be read.
+     *                             - Path to a directory containing individual language profile files (*.php)
+     *                             - Path to a single PHP file containing consolidated language profiles array
+     *
+     * @throws \InvalidArgumentException if the path is invalid or files don't return proper arrays
+     * @throws \RuntimeException         if files cannot be read
      */
     public function __construct(string $profilesPath)
     {
@@ -42,7 +50,7 @@ class LanguageDetector
         } elseif (is_file($profilesPath)) {
             $this->loadConsolidatedProfiles($profilesPath);
         } else {
-            throw new InvalidArgumentException("Profiles path not found or not accessible: " . $profilesPath);
+            throw new \InvalidArgumentException('Profiles path not found or not accessible: '.$profilesPath);
         }
     }
 
@@ -52,10 +60,10 @@ class LanguageDetector
     private function loadIndividualProfiles(string $directory): void
     {
         $this->profiles = [];
-        $profileFiles = glob(rtrim($directory, '/') . '/*.php');
+        $profileFiles = glob(rtrim($directory, '/').'/*.php');
 
         if (empty($profileFiles)) {
-            throw new InvalidArgumentException("No profile files found in directory: " . $directory);
+            throw new \InvalidArgumentException('No profile files found in directory: '.$directory);
         }
 
         foreach ($profileFiles as $file) {
@@ -71,12 +79,12 @@ class LanguageDetector
                 }
             } catch (\Throwable $e) {
                 // Log warning but continue with other files
-                error_log("Warning: Failed to load profile file '{$file}': " . $e->getMessage());
+                error_log("Warning: Failed to load profile file '{$file}': ".$e->getMessage());
             }
         }
 
         if (empty($this->profiles)) {
-            throw new RuntimeException("No valid language profiles could be loaded from: " . $directory);
+            throw new \RuntimeException('No valid language profiles could be loaded from: '.$directory);
         }
     }
 
@@ -86,13 +94,13 @@ class LanguageDetector
     private function loadConsolidatedProfiles(string $filePath): void
     {
         if (!is_readable($filePath)) {
-            throw new InvalidArgumentException("Language profiles file not readable: " . $filePath);
+            throw new \InvalidArgumentException('Language profiles file not readable: '.$filePath);
         }
 
         $loadedProfiles = $this->includeProfileFile($filePath);
 
         if (!is_array($loadedProfiles)) {
-            throw new InvalidArgumentException("Language profiles file did not return an array: " . $filePath);
+            throw new \InvalidArgumentException('Language profiles file did not return an array: '.$filePath);
         }
 
         // Only assign valid profiles: string keys, array values
@@ -112,20 +120,22 @@ class LanguageDetector
     {
         // Suppress warnings, but not fatal errors
         $result = @include $filePath;
-        if ($result === false) {
-            throw new InvalidArgumentException("Failed to include profile file '{$filePath}' (file not found or not readable).");
+        if (false === $result) {
+            throw new \InvalidArgumentException("Failed to include profile file '{$filePath}' (file not found or not readable).");
         }
         if (!is_array($result)) {
-            throw new InvalidArgumentException("Language profiles file did not return an array.");
+            throw new \InvalidArgumentException('Language profiles file did not return an array.');
         }
+
         return $result;
     }
 
     /**
      * Detects the language of the provided code snippet.
      *
-     * @param string $code The code snippet.
-     * @return DetectionResult The detection result.
+     * @param string $code the code snippet
+     *
+     * @return DetectionResult the detection result
      */
     public function detect(string $code): DetectionResult
     {
@@ -170,7 +180,7 @@ class LanguageDetector
         // 4. Calculate Confidence (same logic as before, requires tuning)
         $confidence = 0.0;
         if ($bestLang && $maxScore > 0.1) {
-            $estimatedReasonableMaxScore = 30.0; // TUNE THIS!
+            $estimatedReasonableMaxScore = 15.0; // Lowered from 30.0 for better short-snippet detection
             $confidence = min(1.0, $maxScore / $estimatedReasonableMaxScore);
 
             if ($secondMaxScore > 0 && $maxScore > 0) {
@@ -182,7 +192,7 @@ class LanguageDetector
                 }
             }
 
-            $lengthBoost = min(0.1, ($length / 2000));
+            $lengthBoost = min(0.1, $length / 2000);
             $confidence = min(1.0, $confidence + $lengthBoost);
 
             if ($confidence < self::CONFIDENCE_THRESHOLD) {
@@ -190,7 +200,6 @@ class LanguageDetector
             }
 
             return DetectionResult::create($bestLang, $confidence);
-
         } else {
             return DetectionResult::none();
         }
@@ -198,12 +207,12 @@ class LanguageDetector
 
     /**
      * Uses PHP's built-in tokenizer for a high-confidence check.
-     * (Implementation is the same as before, no changes needed here)
+     * (Implementation is the same as before, no changes needed here).
      */
     private function isCertainlyPhp(string $code): bool
     {
         // If it doesn't even contain typical PHP start markers, skip tokenization
-        if (stripos($code, '<?') === false && stripos($code, '$') === false && stripos($code, '->') === false && stripos($code, '::') === false) {
+        if (false === stripos($code, '<?') && false === stripos($code, '$') && false === stripos($code, '->') && false === stripos($code, '::')) {
             return false;
         }
 
@@ -228,9 +237,9 @@ class LanguageDetector
         foreach ($tokens as $token) {
             if (is_array($token)) {
                 $tokenId = $token[0];
-                $nonWhitespaceTokens++;
+                ++$nonWhitespaceTokens;
 
-                if ($tokenId === T_OPEN_TAG || $tokenId === T_OPEN_TAG_WITH_ECHO) {
+                if (T_OPEN_TAG === $tokenId || T_OPEN_TAG_WITH_ECHO === $tokenId) {
                     $hasOpenTag = true;
                     $hasPhpSpecificTokens = true;
                 }
@@ -243,19 +252,21 @@ class LanguageDetector
                     T_GOTO, T_YIELD, T_THROW, T_FINALLY, T_MATCH,
                 ], true)) {
                     $hasPhpSpecificTokens = true;
-                } elseif ($tokenId === T_STRING && in_array(strtolower($token[1]), ['__construct', '__destruct', '__call', '__get', '__set'], true)) {
+                } elseif (T_STRING === $tokenId && in_array(strtolower($token[1]), ['__construct', '__destruct', '__call', '__get', '__set'], true)) {
                     $hasPhpSpecificTokens = true;
                 }
-            } elseif (trim($token) !== '') {
-                $nonWhitespaceTokens++;
+            } elseif ('' !== trim($token)) {
+                ++$nonWhitespaceTokens;
             }
         }
+
         return $hasPhpSpecificTokens && ($hasOpenTag || $nonWhitespaceTokens > 5);
     }
 
     /**
      * Calculates heuristic scores for all defined languages using loaded profiles.
-     * (Logic now uses $this->profiles instead of self::LANG_PROFILES)
+     * (Logic now uses $this->profiles instead of self::LANG_PROFILES).
+     *
      * @return array<string, float>
      */
     private function calculateScores(string $code): array
@@ -280,7 +291,7 @@ class LanguageDetector
                     ? (is_string($weight) ? $weight : '')
                     : $marker;
                 $markerWeight = is_int($marker) ? 10 : (is_numeric($weight) ? (float) $weight : 0.0);
-                if ($markerText !== '' && str_starts_with($code, $markerText)) {
+                if ('' !== $markerText && str_starts_with($code, $markerText)) {
                     $currentScore += $markerWeight;
                     break;
                 }
@@ -290,7 +301,7 @@ class LanguageDetector
             foreach ($profile['keywords'] as $keyword => $weight) {
                 $keywordStr = is_string($keyword) ? $keyword : '';
                 $weightVal = is_numeric($weight) ? (float) $weight : 0.0;
-                if ($keywordStr !== '' && str_contains($codeLower, strtolower($keywordStr))) {
+                if ('' !== $keywordStr && str_contains($codeLower, strtolower($keywordStr))) {
                     $currentScore += $weightVal;
                 }
             }
@@ -299,7 +310,7 @@ class LanguageDetector
             foreach ($profile['patterns'] as $pattern => $weight) {
                 $patternStr = is_string($pattern) ? $pattern : '';
                 $weightVal = is_numeric($weight) ? (float) $weight : 0.0;
-                if ($patternStr !== '' && @preg_match($patternStr, $code)) {
+                if ('' !== $patternStr && @preg_match($patternStr, $code)) {
                     $currentScore += $weightVal;
                 }
             }
@@ -308,13 +319,14 @@ class LanguageDetector
             foreach ($profile['negative_keywords'] as $marker => $penalty) {
                 $markerStr = is_string($marker) ? $marker : '';
                 $penaltyVal = is_numeric($penalty) ? (float) $penalty : 0.0;
-                if ($markerStr !== '' && stripos($code, $markerStr) !== false) {
+                if ('' !== $markerStr && false !== stripos($code, $markerStr)) {
                     $currentScore += $penaltyVal;
                 }
             }
 
             $scores[$lang] = max(0.0, $currentScore);
         }
+
         return $scores;
     }
 }

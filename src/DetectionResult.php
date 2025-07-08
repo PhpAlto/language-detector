@@ -2,6 +2,15 @@
 
 declare(strict_types=1);
 
+/*
+ * This file is part of the ALTO library.
+ *
+ * © 2025–present Simon André
+ *
+ * For full copyright and license information, please see
+ * the LICENSE file distributed with this source code.
+ */
+
 namespace Alto\LanguageDetector; // Your chosen namespace
 
 /**
@@ -45,7 +54,6 @@ final readonly class DetectionResult
         return new self($language, $confidence);
     }
 
-
     /**
      * Gets the best guess for the language identifier (e.g., 'php', 'javascript').
      * Returns null if no language could be confidently identified based on internal thresholds.
@@ -72,6 +80,6 @@ final readonly class DetectionResult
      */
     public function isConfident(float $threshold = 0.5): bool
     {
-        return $this->language !== null && $this->confidence >= $threshold;
+        return null !== $this->language && $this->confidence >= $threshold;
     }
 }

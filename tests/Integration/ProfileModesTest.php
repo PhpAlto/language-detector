@@ -2,18 +2,24 @@
 
 declare(strict_types=1);
 
+/*
+ * This file is part of the ALTO library.
+ *
+ * © 2025–present Simon André
+ *
+ * For full copyright and license information, please see
+ * the LICENSE file distributed with this source code.
+ */
+
 namespace Alto\LanguageDetector\Tests\Integration;
 
-use Alto\LanguageDetector\LanguageDetector;
 use Alto\LanguageDetector\DetectionResult;
-use PHPUnit\Framework\TestCase;
+use Alto\LanguageDetector\LanguageDetector;
 use PHPUnit\Framework\Attributes\CoversClass;
-use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Test;
+use PHPUnit\Framework\TestCase;
 
-/**
- * Integration tests comparing consolidated vs individual profile modes.
- */
 #[CoversClass(LanguageDetector::class)]
 #[CoversClass(DetectionResult::class)]
 final class ProfileModesTest extends TestCase
@@ -26,15 +32,12 @@ final class ProfileModesTest extends TestCase
         parent::setUp();
 
         // Consolidated profiles (20+ languages)
-        $this->consolidatedDetector = new LanguageDetector(__DIR__ . '/../../data/languages_signatures.php');
+        $this->consolidatedDetector = new LanguageDetector(__DIR__.'/../../data/languages_signatures.php');
 
-        // Individual profiles (8 enhanced languages)
-        $this->individualDetector = new LanguageDetector(__DIR__ . '/../../data/language');
+        // Individual profiles (12 enhanced languages)
+        $this->individualDetector = new LanguageDetector(__DIR__.'/../../data/language');
     }
 
-    /**
-     * Test that both modes can detect common languages correctly.
-     */
     #[Test]
     #[DataProvider('commonLanguagesProvider')]
     public function testBothModesDetectCommonLanguages(string $code, string $expectedLanguage): void
@@ -67,23 +70,20 @@ final class ProfileModesTest extends TestCase
         );
     }
 
-    /**
-     * Provides test cases for languages supported by both modes.
-     */
     public static function commonLanguagesProvider(): array
     {
         return [
-            'PHP with tag' => ['<?php class Test { public $var = 42; function method() { return $this->var; } }', 'php'],
-            'JavaScript const' => ['const message = "Hello"; function greet() { console.log(message); } export { greet };', 'javascript'],
-            'TypeScript interface' => ['interface User { name: string; age: number; } function createUser(): User { return { name: "test", age: 25 }; }', 'typescript'],
-            'HTML document' => ['<!DOCTYPE html><html><head><title>Test</title></head><body><div class="container"><p>Hello</p></div></body></html>', 'html'],
             'CSS styles' => ['.container { display: flex; padding: 1rem; } .header { background: #333; color: white; }', 'css'],
+            'HTML document' => ['<!DOCTYPE html><html><head><title>Test</title></head><body><div class="container"><p>Hello</p></div></body></html>', 'html'],
+            'Go package' => ['package main\n\nimport "fmt"\n\nfunc main() {\n    message := "Hello World"\n    fmt.Println(message)\n}\n\ntype User struct {\n    Name string\n    Age  int\n}', 'go'],
+            'Java class' => ['public class HelloWorld {\n    private String message;\n    public HelloWorld() {\n        this.message = "Hello";\n    }\n    public static void main(String[] args) {\n        System.out.println("Hello World");\n    }\n}', 'java'],
+            'JavaScript const' => ['const message = "Hello"; function greet() { console.log(message); } export { greet };', 'javascript'],
+            'PHP with tag' => ['<?php class Test { public $var = 42; function method() { return $this->var; } }', 'php'],
+            'Ruby class' => ['class User\n  attr_accessor :name, :email\n  \n  def initialize(name, email)\n    @name = name\n    @email = email\n  end\n  \n  def greet\n    puts "Hello #{@name}"\n  end\nend', 'ruby'],
+            'TypeScript interface' => ['interface User { name: string; age: number; } function createUser(): User { return { name: "test", age: 25 }; }', 'typescript'],
         ];
     }
 
-    /**
-     * Test that consolidated mode supports languages not in individual mode.
-     */
     #[Test]
     #[DataProvider('consolidatedOnlyLanguagesProvider')]
     public function testConsolidatedOnlyLanguages(string $code, string $expectedLanguage): void
@@ -107,23 +107,14 @@ final class ProfileModesTest extends TestCase
         );
     }
 
-    /**
-     * Provides test cases for languages only supported by consolidated mode.
-     */
     public static function consolidatedOnlyLanguagesProvider(): array
     {
         return [
-            'Java class' => ['public class HelloWorld {\n    private String message;\n    public HelloWorld() {\n        this.message = "Hello";\n    }\n    public static void main(String[] args) {\n        System.out.println("Hello World");\n    }\n}', 'java'],
-            'Go package' => ['package main\n\nimport "fmt"\n\nfunc main() {\n    message := "Hello World"\n    fmt.Println(message)\n}\n\ntype User struct {\n    Name string\n    Age  int\n}', 'go'],
-            'Ruby class' => ['class User\n  attr_accessor :name, :email\n  \n  def initialize(name, email)\n    @name = name\n    @email = email\n  end\n  \n  def greet\n    puts "Hello #{@name}"\n  end\nend', 'ruby'],
             'JSON object' => ['{\n  "name": "test",\n  "value": 42,\n  "active": true,\n  "data": {\n    "items": [1, 2, 3],\n    "config": null\n  }\n}', 'json'],
             'Bash script' => ['#!/bin/bash\nset -e\n\nNAME="World"\necho "Hello $NAME"\n\nif [ "$1" == "test" ]; then\n  echo "Test mode enabled"\n  export DEBUG=1\nfi\n\nfunction cleanup() {\n  echo "Cleaning up..."\n}\n\ntrap cleanup EXIT', 'bash'],
         ];
     }
 
-    /**
-     * Test that individual mode supports languages not in consolidated mode.
-     */
     #[Test]
     #[DataProvider('individualOnlyLanguagesProvider')]
     public function testIndividualOnlyLanguages(string $code, string $expectedLanguage): void
@@ -147,9 +138,6 @@ final class ProfileModesTest extends TestCase
         );
     }
 
-    /**
-     * Provides test cases for languages only supported by individual mode.
-     */
     public static function individualOnlyLanguagesProvider(): array
     {
         return [
@@ -159,9 +147,6 @@ final class ProfileModesTest extends TestCase
         ];
     }
 
-    /**
-     * Test that individual mode has enhanced detection for supported languages.
-     */
     #[Test]
     public function testIndividualModeEnhancedDetection(): void
     {
@@ -175,16 +160,14 @@ final class ProfileModesTest extends TestCase
         $this->assertContains($consolidatedResult->getLanguage(), ['css', 'scss', null]);
         $this->assertSame('scss', $individualResult->getLanguage());
 
-        // Individual mode should have higher confidence for SCSS-specific syntax
+        // Individual mode should have high confidence for SCSS-specific syntax
+        $this->assertGreaterThanOrEqual(0.75, $individualResult->getConfidence());
         $this->assertGreaterThanOrEqual(
             $consolidatedResult->getConfidence(),
             $individualResult->getConfidence(),
         );
     }
 
-    /**
-     * Test PHP tokenizer works in both modes.
-     */
     #[Test]
     public function testPhpTokenizerInBothModes(): void
     {
@@ -202,9 +185,6 @@ final class ProfileModesTest extends TestCase
         $this->assertGreaterThan(0.9, $individualResult->getConfidence());
     }
 
-    /**
-     * Test that both modes handle ambiguous code appropriately.
-     */
     #[Test]
     public function testAmbiguousCodeHandling(): void
     {
@@ -215,11 +195,11 @@ final class ProfileModesTest extends TestCase
         $individualResult = $this->individualDetector->detect($ambiguousCode);
 
         // Both should either detect a language with reasonable confidence or return null
-        if ($consolidatedResult->getLanguage() !== null) {
+        if (null !== $consolidatedResult->getLanguage()) {
             $this->assertGreaterThanOrEqual(0.25, $consolidatedResult->getConfidence());
         }
 
-        if ($individualResult->getLanguage() !== null) {
+        if (null !== $individualResult->getLanguage()) {
             $this->assertGreaterThanOrEqual(0.25, $individualResult->getConfidence());
         }
     }

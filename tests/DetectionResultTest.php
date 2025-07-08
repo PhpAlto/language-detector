@@ -2,17 +2,23 @@
 
 declare(strict_types=1);
 
+/*
+ * This file is part of the ALTO library.
+ *
+ * © 2025–present Simon André
+ *
+ * For full copyright and license information, please see
+ * the LICENSE file distributed with this source code.
+ */
+
 namespace Alto\LanguageDetector\Tests;
 
 use Alto\LanguageDetector\DetectionResult;
-use PHPUnit\Framework\TestCase;
 use PHPUnit\Framework\Attributes\CoversClass;
-use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Test;
+use PHPUnit\Framework\TestCase;
 
-/**
- * Unit tests for the DetectionResult value object.
- */
 #[CoversClass(DetectionResult::class)]
 final class DetectionResultTest extends TestCase
 {
@@ -67,9 +73,6 @@ final class DetectionResultTest extends TestCase
         $this->assertSame($expectedConfidence, $result->getConfidence());
     }
 
-    /**
-     * Provides test cases for confidence clamping behavior.
-     */
     public static function confidenceClampingProvider(): array
     {
         return [
@@ -90,9 +93,6 @@ final class DetectionResultTest extends TestCase
         $this->assertSame($expected, $result->isConfident($threshold));
     }
 
-    /**
-     * Provides test cases for confidence threshold testing.
-     */
     public static function confidenceThresholdProvider(): array
     {
         return [

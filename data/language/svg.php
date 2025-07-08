@@ -2,15 +2,13 @@
 
 declare(strict_types=1);
 
-/**
- * Language Profile for SVG (Scalable Vector Graphics) detection.
- * For use with Alto\LanguageDetector
+/*
+ * This file is part of the ALTO library.
  *
- * This file returns an array containing the heuristic definition for SVG.
- * It verifies an XML structure and looks for the <svg> root element,
- * the SVG namespace, and common SVG graphical elements and attributes.
+ * © 2025–present Simon André
  *
- * @return array The language profiles array containing only 'svg'.
+ * For full copyright and license information, please see
+ * the LICENSE file distributed with this source code.
  */
 
 return [
@@ -55,7 +53,6 @@ return [
             '/\b[\w\-]+:[\w\-]+\s*=\s*["\']/i' => 0.5, // Attributes with Namespaces (e.g., xlink:href) - covered above better
             '/<([a-zA-Z_][\w\-\:\.]*)\b[^>]*\/\s*>/s' => 0.5, // Self-closing tag syntax confirmation
             '/<\/([a-zA-Z_][\w\-\:\.]*)\s*>/s' => 0.5, // Closing tag syntax confirmation
-
         ],
         // Penalize syntax from other common languages, especially HTML specifics
         'negative_keywords' => [
@@ -63,7 +60,7 @@ return [
             '<html' => -7, '<head' => -7, '<body' => -7, '<title' => -2, // Penalize structural HTML tags (title could appear in SVG)
             '<div' => -3, '<span' => -3, '<p' => -3, '<form' => -5, '<input' => -5, // Penalize common block/inline HTML
             '<?php' => -10, '<?=' => -10,       // PHP tags
-            '{%' => -10, '{{' => -10, '{#' => -10,// Twig delimiters
+            '{%' => -10, '{{' => -10, '{#' => -10, // Twig delimiters
             '$' => -5,                      // PHP/Sass variables
             'function ' => -5, 'var ' => -7, 'let ' => -7, 'const ' => -7, // JS keywords (unless inside <script>) - hard to check context well
             '{ color:' => -5,                // CSS rule (unless inside <style>)

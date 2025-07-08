@@ -2,14 +2,13 @@
 
 declare(strict_types=1);
 
-/**
- * Language Profile for JavaScript detection.
- * For use with Alto\LanguageDetector
+/*
+ * This file is part of the ALTO library.
  *
- * This file returns an array containing the heuristic definition for JavaScript.
- * Focuses on pure JavaScript patterns, distinguishing from TypeScript.
+ * © 2025–present Simon André
  *
- * @return array The language profiles array containing 'javascript'.
+ * For full copyright and license information, please see
+ * the LICENSE file distributed with this source code.
  */
 
 return [

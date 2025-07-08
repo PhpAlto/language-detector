@@ -2,15 +2,13 @@
 
 declare(strict_types=1);
 
-/**
- * Language Profiles for CSS and SCSS (Sass) detection.
- * For use with Alto\LanguageDetector
+/*
+ * This file is part of the ALTO library.
  *
- * This file returns an array containing heuristic definitions.
- * SCSS profile focuses on SCSS-specific syntax extensions over CSS.
- * CSS profile includes penalties for SCSS-specific syntax.
+ * © 2025–present Simon André
  *
- * @return array The language profiles array containing 'css' and 'scss'.
+ * For full copyright and license information, please see
+ * the LICENSE file distributed with this source code.
  */
 
 return [

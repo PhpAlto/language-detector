@@ -2,15 +2,13 @@
 
 declare(strict_types=1);
 
-/**
- * Language Profile for XML detection.
- * For use with Alto\LanguageDetector
+/*
+ * This file is part of the ALTO library.
  *
- * This file returns an array containing the heuristic definition for XML.
- * Focuses on XML declaration, namespaces, CDATA, processing instructions,
- * and stricter tag formats compared to HTML.
+ * © 2025–present Simon André
  *
- * @return array The language profiles array containing 'xml'.
+ * For full copyright and license information, please see
+ * the LICENSE file distributed with this source code.
  */
 
 return [
